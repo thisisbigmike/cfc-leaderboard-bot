@@ -14,8 +14,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Configuration
-BOT_TOKEN = os.environ.get('BOT_TOKEN', '8243897329:AAF8u9bfRXbnm3ycWXFRQk-bwpBOjS8xFuQ')
-CHAT_ID = os.environ.get('CHAT_ID', '-1003261673950')  # Group chat ID
+BOT_TOKEN = os.environ.get('BOT_TOKEN')
+CHAT_ID = os.environ.get('CHAT_ID')
 API_URL = 'https://fight.cryptofightclub.wtf/api/top-scores'
 POST_INTERVAL = 3600  # 1 hour in seconds
 
@@ -56,7 +56,7 @@ def format_leaderboard_message(scores):
         message += f"   {username}\n\n"
     
     # Add timestamp
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC")
+    now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
     message += f"<i>Last updated: {now}</i>"
     
     return message
@@ -110,18 +110,14 @@ async def post_leaderboard_job(context: ContextTypes.DEFAULT_TYPE):
     logger.info("Running scheduled leaderboard post")
     await send_leaderboard(context)
 
-async def post_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Log errors"""
-    logger.error(f"Update {update} caused error {context.error}")
-
 def main():
     """Start the bot"""
     # Validate configuration
-    if BOT_TOKEN == 'YOUR_BOT_TOKEN_HERE':
+    if not BOT_TOKEN:
         logger.error("Please set BOT_TOKEN environment variable!")
         return
     
-    if CHAT_ID == 'YOUR_CHAT_ID_HERE':
+    if not CHAT_ID:
         logger.error("Please set CHAT_ID environment variable!")
         return
     
@@ -132,9 +128,6 @@ def main():
     application.add_handler(CommandHandler("start", start_command))
     application.add_handler(CommandHandler("leaderboard", leaderboard_command))
     
-    # Add error handler
-    application.add_error_handler(post_error)
-    
     # Schedule hourly leaderboard posts
     job_queue = application.job_queue
     job_queue.run_repeating(
@@ -144,6 +137,7 @@ def main():
     )
     
     logger.info("Bot started! Leaderboard will be posted every hour.")
+    logger.info(f"Posting to chat ID: {CHAT_ID}")
     
     # Start the bot
     application.run_polling(allowed_updates=Update.ALL_TYPES)
