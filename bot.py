@@ -14,8 +14,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Configuration
-BOT_TOKEN = os.environ.get('BOT_TOKEN')
-CHAT_ID = os.environ.get('CHAT_ID')
+BOT_TOKEN = os.environ.get('8243897329:AAF8u9bfRXbnm3ycWXFRQk-bwpBOjS8xFuQ')
+CHAT_ID = os.environ.get('-1003261673950')
 API_URL = 'https://fight.cryptofightclub.wtf/api/top-scores'
 POST_INTERVAL = 3600  # 1 hour in seconds
 
